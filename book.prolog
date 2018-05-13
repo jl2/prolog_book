@@ -87,3 +87,57 @@ partsoflist([P | Tail], Total) :-
     partsof(P, Headparts),
     partsoflist(Tail, Tailparts),
     append(Headparts, Tailparts, Total).
+
+
+door(a,b).
+door(b,e).
+door(b,c).
+door(d,e).
+door(c,d).
+door(e,f).
+door(g,e).
+hasphone(g).
+
+go(X,X,_).
+go(X,Y,T) :- (door(X, Z); door(Z,X)), not(member(Z,T)), go(Z,Y, [Z|T]), display(T).
+
+
+hanoi(N) :- move(N, left, centre, right).
+move(0,_,_,_) :- !.
+move(N,A,B,C) :-
+    M is N-1,
+    move(M, A,C,B),
+    inform(A,B),
+    move(M,C,B,A).
+inform(X,Y) :-
+    write([move,a,disc,from,the,X,pole,to,the,Y,pole]), nl.
+
+
+partlist(T) :- partsof(1, T, P), collect(P,Q), printpartlist(Q).
+partsof(N,X,P) :- assembly(X, S), partsoflist(N,S,P).
+parsof(N,X, [quant(X,N)]) :- basicpart(X).
+
+partsoflist(_, [], []).
+partsoflist(N, [quant(X, Num)|L],T) :-
+    M is N*Num,
+    partsof(M, X, Xparts),
+    partsoflist(N,L,Restparts),
+    append(Xparts, Restparts, T).
+
+collect([], []).
+collect([quant(X,N)|R], [quant(X,Ntotal)|R2]) :-
+    collectrest(X,N,R,O,Ntotal),
+    collect(O, R2).
+
+collectrest(_, N, [], [], N).
+collectrest(X,N, [quant(X,Num)|Rest], Others, Ntotal) :-
+    !,
+    M is N + Num,
+    collectrest(X,M,Rest,Others,Ntotal).
+collectrest(X, N, [Other|Rest], [Other|Others],Ntotal) :-
+    collectrest(X, N, Rest,Others,Ntotal).
+
+printpartlist([]).
+printpartlist([quant(X,N) | R]) :-
+    tab(4), write(N), put(9),write(X), nl, printpartlist(R).
+
